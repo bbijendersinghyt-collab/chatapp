@@ -1,0 +1,101 @@
+@import "tailwindcss";
+
+@layer utilities {
+  /* Hide scrollbars for slick mobile touch experience */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+/* Scanner laser keyframe animation */
+@keyframes scanLaser {
+  0% {
+    top: 5%;
+    opacity: 0.8;
+  }
+  50% {
+    top: 92%;
+    opacity: 1;
+  }
+  100% {
+    top: 5%;
+    opacity: 0.8;
+  }
+}
+
+.animate-scan-laser {
+  animation: scanLaser 2.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+/* Light Theme Variables */
+.light-theme {
+  --bg-primary: #f8fafc;
+  --bg-surface: #ffffff;
+  --text-primary: #0f172a;
+}
+
+.light-theme main {
+  background-color: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+}
+
+.light-theme header {
+  background-color: rgba(248, 250, 252, 0.95) !important;
+  border-color: #e2e8f0 !important;
+}
+
+.light-theme .text-white {
+  color: #0f172a !important;
+}
+
+.light-theme .text-slate-100 {
+  color: #1e293b !important;
+}
+
+.light-theme .text-slate-200 {
+  color: #334155 !important;
+}
+
+.light-theme .bg-\[\#060b18\] {
+  background-color: #f8fafc !important;
+}
+
+.light-theme .bg-\[\#0c162e\] {
+  background-color: #f1f5f9 !important;
+}
+
+.light-theme .bg-\[\#070c1b\] {
+  background-color: #ffffff !important;
+}
+
+.light-theme .bg-slate-800\/95 {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border-color: #e2e8f0 !important;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.08) !important;
+}
+
+.light-theme .bg-slate-800\/95:hover {
+  background-color: #f8fafc !important;
+}
+
+.light-theme .bg-\[\#1a253d\] {
+  background-color: #e2e8f0 !important;
+  color: #1e3a8a !important;
+  border-color: #cbd5e1 !important;
+}
+
+.light-theme .bg-\[\#0c1427\]\/90 {
+  background-color: #f1f5f9 !important;
+  border-color: #e2e8f0 !important;
+}
+
+.light-theme .border-cyan-900\/30,
+.light-theme .border-cyan-900\/40,
+.light-theme .border-cyan-800\/40 {
+  border-color: #e2e8f0 !important;
+}

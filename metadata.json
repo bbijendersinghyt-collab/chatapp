@@ -1,0 +1,8 @@
+{
+  "name": "ScanCalc AI",
+  "description": "Premium Android-friendly calculator featuring standard & scientific calculation, floating math camera scanner with real OCR, step-by-step AI solutions, and instant Google Search.",
+  "requestFramePermissions": [
+    "camera"
+  ],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

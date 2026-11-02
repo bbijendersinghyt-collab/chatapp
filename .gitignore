@@ -1,0 +1,17 @@
+node_modules/
+dist/
+coverage/
+.DS_Store
+*.log
+.env*
+!.env.example
+
+# Android build outputs
+.gradle/
+build/
+android/app/build/
+android/.gradle/
+android/build/
+android/app/src/main/assets/dist/
+release-artifacts/
+!android/gradle/wrapper/gradle-wrapper.jar

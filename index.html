@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <title>ScanCalc AI</title>
+    <meta name="description" content="Premium Android-friendly calculator featuring standard & scientific calculation, floating math camera scanner with real OCR, step-by-step AI solutions, and instant Google Search." />
+    <meta property="og:title" content="ScanCalc AI" />
+    <meta property="og:description" content="Premium Android-friendly calculator featuring standard & scientific calculation, floating math camera scanner with real OCR, step-by-step AI solutions, and instant Google Search." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="theme-color" content="#0B132B" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="ScanCalc AI" />
+    <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+    <link rel="apple-touch-icon" href="/pwa-192x192.png" />
+    <script>
+      // Gracefully handle benign Vite HMR WebSocket disconnects in proxy / iframe environments
+      window.addEventListener('unhandledrejection', function(event) {
+        if (event?.reason?.message && (event.reason.message.includes('WebSocket') || event.reason.message.includes('vite'))) {
+          event.preventDefault();
+        }
+      });
+      window.addEventListener('error', function(event) {
+        if (event?.message && (event.message.includes('WebSocket closed') || event.message.includes('@vite/client'))) {
+          event.preventDefault();
+        }
+      });
+    </script>
+  </head>
+  <body class="bg-[#070b19] text-slate-100 antialiased selection:bg-cyan-500 selection:text-white select-none">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+

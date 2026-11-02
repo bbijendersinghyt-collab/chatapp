@@ -1,0 +1,153 @@
+name: Build Android Debug APK & GitHub Release
+
+on:
+  push:
+    branches:
+      - main
+      - master
+    tags:
+      - 'v*'
+  pull_request:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+    inputs:
+      create_release:
+        description: 'Publish a GitHub Release with the APK'
+        required: false
+        type: boolean
+        default: true
+      release_tag:
+        description: 'Release tag (e.g. v1.0.0)'
+        required: false
+        type: string
+        default: 'v1.0.0'
+      release_title:
+        description: 'Release Title'
+        required: false
+        type: string
+        default: 'ScanCalc AI v1.0.0 (Debug APK)'
+
+permissions:
+  contents: write
+
+jobs:
+  build-apk:
+    name: Build Android Debug APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Web Dependencies
+        run: |
+          npm ci || npm install
+
+      - name: Build Web Application
+        run: |
+          npm run build
+
+      - name: Package Web Build into Android Assets
+        run: |
+          mkdir -p android/app/src/main/assets
+          rm -rf android/app/src/main/assets/dist
+          cp -r dist android/app/src/main/assets/dist
+          echo "Web application assets bundled into android/app/src/main/assets/dist"
+
+      - name: Setup Java 17 (JDK)
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'gradle'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Grant Execute Permission to Gradle Wrapper
+        run: |
+          chmod +x android/gradlew
+
+      - name: Build Android Debug APK with Gradle
+        working-directory: ./android
+        run: |
+          ./gradlew assembleDebug --no-daemon --stacktrace
+
+      - name: Locate & Prepare APK Artifact
+        run: |
+          mkdir -p release-artifacts
+          APK_PATH=$(find android/app/build/outputs/apk/debug -name "*.apk" | head -n 1)
+          if [ -z "$APK_PATH" ]; then
+            echo "Error: No APK file was generated."
+            exit 1
+          fi
+          echo "Found APK at: $APK_PATH"
+          cp "$APK_PATH" release-artifacts/ScanCalcAI-debug.apk
+          ls -la release-artifacts/
+
+      - name: Upload Debug APK Artifact (Actions Run)
+        uses: actions/upload-artifact@v4
+        with:
+          name: ScanCalcAI-debug-apk
+          path: release-artifacts/ScanCalcAI-debug.apk
+          retention-days: 30
+
+      - name: Determine Release Tag
+        id: release_vars
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            TAG="${{ inputs.release_tag }}"
+            TITLE="${{ inputs.release_title }}"
+            PUBLISH="${{ inputs.create_release }}"
+          elif [[ "${{ github.ref }}" == refs/tags/* ]]; then
+            TAG="${GITHUB_REF#refs/tags/}"
+            TITLE="ScanCalc AI Release $TAG"
+            PUBLISH="true"
+          elif [ "${{ github.ref }}" = "refs/heads/main" ] || [ "${{ github.ref }}" = "refs/heads/master" ]; then
+            TAG="v1.0.0-build-${{ github.run_number }}"
+            TITLE="ScanCalc AI Automated Build #${{ github.run_number }}"
+            PUBLISH="true"
+          else
+            PUBLISH="false"
+            TAG="untagged"
+            TITLE="Development Build"
+          fi
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+          echo "title=$TITLE" >> $GITHUB_OUTPUT
+          echo "publish=$PUBLISH" >> $GITHUB_OUTPUT
+
+      - name: Publish Direct APK Download via GitHub Releases
+        if: steps.release_vars.outputs.publish == 'true'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.release_vars.outputs.tag }}
+          name: ${{ steps.release_vars.outputs.title }}
+          draft: false
+          prerelease: false
+          files: release-artifacts/ScanCalcAI-debug.apk
+          body: |
+            ### 📱 ScanCalc AI Android Debug APK
+
+            Download the standalone Android `.apk` below and install directly onto your Android device:
+
+            - 📥 **Direct APK Download**: [`ScanCalcAI-debug.apk`](https://github.com/${{ github.repository }}/releases/download/${{ steps.release_vars.outputs.tag }}/ScanCalcAI-debug.apk)
+            - **Commit**: `${{ github.sha }}`
+            - **Build Run**: [#${{ github.run_number }}](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+
+            #### How to Install:
+            1. Tap on **`ScanCalcAI-debug.apk`** to download on your phone.
+            2. When prompted by Android, tap **Settings** and allow **Install unknown apps**.
+            3. Tap **Install** to complete installation.
+            4. Launch **ScanCalc AI** from your app drawer!
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
